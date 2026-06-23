@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api/axios";
+import CreateTripDialog from "@/components/dashboard/CreateTripDialog";
 
 interface Trip {
   _id: string;
@@ -39,6 +40,8 @@ export default function DashboardPage() {
     <div className="max-w-6xl mx-auto p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">My Trips</h1>
+
+        <CreateTripDialog onSuccess={fetchTrips} />
       </div>
 
       {trips.length === 0 ? (
