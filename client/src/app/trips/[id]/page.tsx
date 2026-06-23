@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api/axios";
 
+import AddActivityDialog from "@/components/trip/AddActivityDialog";
+import DeleteActivityDialog from "@/components/trip/DeleteActivityDialog";
+import { toast } from "sonner";
+
 interface Trip {
   _id: string;
   destination: string;
@@ -36,6 +40,7 @@ export default function TripDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const [trip, setTrip] = useState<Trip | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchTrip();
@@ -47,6 +52,36 @@ export default function TripDetailsPage({
     const response = await api.get(`/trips/${id}`);
 
     setTrip(response.data.trip);
+  };
+
+  const removeActivity = (dayIndex: number, activityIndex: number) => {
+    if (!trip) return;
+
+    const updatedTrip = structuredClone(trip);
+
+    updatedTrip.itinerary[dayIndex].activities.splice(activityIndex, 1);
+
+    setTrip(updatedTrip);
+  };
+
+  const saveItinerary = async () => {
+    if (!trip) return;
+
+    try {
+      setSaving(true);
+
+      await api.put(`/trips/${trip._id}/itinerary`, {
+        itinerary: trip.itinerary,
+      });
+
+      toast.success("Itinerary saved successfully");
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Failed to save itinerary");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!trip) {
@@ -64,18 +99,49 @@ export default function TripDetailsPage({
       </div>
 
       <section>
-        <h2 className="text-2xl font-semibold mb-4">Itinerary</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">Itinerary</h2>
+
+          <button
+            onClick={saveItinerary}
+            disabled={saving}
+            className="bg-black text-white px-4 py-2 rounded"
+          >
+            {saving ? "Saving..." : "Save Itinerary"}
+          </button>
+        </div>
 
         <div className="space-y-4">
-          {trip.itinerary.map((day) => (
+          {trip.itinerary.map((day, dayIndex) => (
             <div key={day.day} className="border rounded-lg p-4">
-              <h3 className="font-bold">Day {day.day}</h3>
+              <h3 className="font-bold text-lg">Day {day.day}</h3>
 
-              <ul className="list-disc ml-5 mt-2">
-                {day.activities.map((activity, index) => (
-                  <li key={index}>{activity}</li>
+              <div className="mt-3 space-y-2">
+                {day.activities.map((activity, activityIndex) => (
+                  <div
+                    key={activityIndex}
+                    className="flex items-center justify-between border rounded p-2"
+                  >
+                    <span>{activity}</span>
+
+                    <DeleteActivityDialog
+                      onDelete={() => removeActivity(dayIndex, activityIndex)}
+                    />
+                  </div>
                 ))}
-              </ul>
+
+                <AddActivityDialog
+                  onAdd={(activity) => {
+                    if (!trip) return;
+
+                    const updatedTrip = structuredClone(trip);
+
+                    updatedTrip.itinerary[dayIndex].activities.push(activity);
+
+                    setTrip(updatedTrip);
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>

@@ -5,6 +5,7 @@ import {
   getTripById,
   deleteTrip,
   updateTrip,
+  updateItinerary,
 } from "../controllers/trip.controller";
 import { protect } from "../middleware/auth.middleware";
 
@@ -17,6 +18,8 @@ router.get("/", protect, getMyTrips);
 router.get("/:id", protect, getTripById);
 
 router.put("/:id", protect, updateTrip);
+
+router.put("/:id/itinerary", protect, updateItinerary);
 
 router.delete("/:id", protect, deleteTrip);
 
