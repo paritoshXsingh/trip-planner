@@ -122,3 +122,37 @@ export const deleteTrip = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+export const updateTrip = async (req: AuthRequest, res: Response) => {
+  try {
+    const trip = await Trip.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        userId: req.user?.id,
+      },
+      req.body,
+      {
+        new: true,
+      },
+    );
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: "Trip not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      trip,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update trip",
+    });
+  }
+};

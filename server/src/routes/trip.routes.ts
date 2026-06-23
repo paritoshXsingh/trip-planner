@@ -4,6 +4,7 @@ import {
   getMyTrips,
   getTripById,
   deleteTrip,
+  updateTrip,
 } from "../controllers/trip.controller";
 import { protect } from "../middleware/auth.middleware";
 
@@ -14,6 +15,8 @@ router.post("/", protect, createTrip);
 router.get("/", protect, getMyTrips);
 
 router.get("/:id", protect, getTripById);
+
+router.put("/:id", protect, updateTrip);
 
 router.delete("/:id", protect, deleteTrip);
 
