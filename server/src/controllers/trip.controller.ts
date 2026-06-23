@@ -33,3 +33,80 @@ export const createTrip = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+export const getMyTrips = async (req: AuthRequest, res: Response) => {
+  try {
+    const trips = await Trip.find({
+      userId: req.user?.id,
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: trips.length,
+      trips,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch trips",
+    });
+  }
+};
+
+export const getTripById = async (req: AuthRequest, res: Response) => {
+  try {
+    const trip = await Trip.findOne({
+      _id: req.params.id,
+      userId: req.user?.id,
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: "Trip not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      trip,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch trip",
+    });
+  }
+};
+
+export const deleteTrip = async (req: AuthRequest, res: Response) => {
+  try {
+    const trip = await Trip.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user?.id,
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: "Trip not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Trip deleted",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete trip",
+    });
+  }
+};
