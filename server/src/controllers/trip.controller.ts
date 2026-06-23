@@ -1,10 +1,18 @@
 import { Response } from "express";
 import { Trip } from "../models/trip.model";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { generateTripPlan } from "../services/gemini.service";
 
 export const createTrip = async (req: AuthRequest, res: Response) => {
   try {
     const { destination, days, budgetType, interests } = req.body;
+
+    const aiPlan = await generateTripPlan(
+      destination,
+      days,
+      budgetType,
+      interests,
+    );
 
     const trip = await Trip.create({
       userId: req.user?.id,
@@ -14,10 +22,13 @@ export const createTrip = async (req: AuthRequest, res: Response) => {
       budgetType,
       interests,
 
-      itinerary: [],
-      budgetBreakdown: {},
-      hotels: [],
-      packingList: [],
+      itinerary: aiPlan.itinerary,
+
+      budgetBreakdown: aiPlan.budgetBreakdown,
+
+      hotels: aiPlan.hotels,
+
+      packingList: aiPlan.packingList,
     });
 
     res.status(201).json({
@@ -29,7 +40,8 @@ export const createTrip = async (req: AuthRequest, res: Response) => {
 
     res.status(500).json({
       success: false,
-      message: "Failed to create trip",
+      message:
+        error instanceof Error ? error.message : "Failed to generate trip",
     });
   }
 };

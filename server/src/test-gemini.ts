@@ -6,19 +6,22 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 async function testGemini() {
-  try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-    });
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+  });
 
-    const result = await model.generateContent(
-      "Reply with exactly: Gemini is working",
-    );
+  const prompt = `
+Return ONLY valid JSON.
 
-    console.log(result.response.text());
-  } catch (error) {
-    console.error(error);
-  }
+{
+  "city":"Tokyo",
+  "days":3
+}
+`;
+
+  const result = await model.generateContent(prompt);
+
+  console.log(result.response.text());
 }
 
 testGemini();
