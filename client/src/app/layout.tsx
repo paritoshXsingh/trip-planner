@@ -4,7 +4,10 @@ import { Geist, Geist_Mono, Figtree } from "next/font/google";
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
+
 import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -22,7 +25,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Trao AI Travel Planner",
+  title: "TripPilot | Your AI Travel Co-Pilot",
   description:
     "Generate personalized travel itineraries, budget estimates, hotel recommendations, and packing lists using AI.",
 };
@@ -41,11 +44,17 @@ export default function RootLayout({
         geistSans.variable,
         geistMono.variable,
         figtree.variable,
-        "font-sans",
+        "font-sans"
       )}
     >
-      <body className="min-h-full flex flex-col">
-        {children}
+      <body className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+        <Navbar />
+
+        <main className="flex-1">
+          {children}
+        </main>
+
+        <Footer />
 
         <Toaster richColors />
       </body>

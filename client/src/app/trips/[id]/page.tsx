@@ -1,17 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { api } from "@/lib/api/axios";
 
 import AddActivityDialog from "@/components/trip/AddActivityDialog";
 import DeleteActivityDialog from "@/components/trip/DeleteActivityDialog";
+import RegenerateDayDialog from "@/components/trip/RegenerateDayDialog";
+
 import { toast } from "sonner";
+
+import { MapPin, Sparkles, Bot } from "lucide-react";
+import TripDetailsSkeleton from "@/components/trip/TripDetailsSkeleton";
 
 interface Trip {
   _id: string;
+
   destination: string;
+
   days: number;
+
   budgetType: string;
+
+  aiProvider?: "gemini" | "fallback";
 
   itinerary: {
     day: number;
@@ -40,6 +51,7 @@ export default function TripDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const [trip, setTrip] = useState<Trip | null>(null);
+
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -47,11 +59,17 @@ export default function TripDetailsPage({
   }, []);
 
   const fetchTrip = async () => {
-    const { id } = await params;
+    try {
+      const { id } = await params;
 
-    const response = await api.get(`/trips/${id}`);
+      const response = await api.get(`/trips/${id}`);
 
-    setTrip(response.data.trip);
+      setTrip(response.data.trip);
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Failed to load trip");
+    }
   };
 
   const removeActivity = (dayIndex: number, activityIndex: number) => {
@@ -84,43 +102,120 @@ export default function TripDetailsPage({
     }
   };
 
+  const regenerateDay = async (day: number, preference: string) => {
+    if (!trip) return;
+
+    try {
+      const response = await api.post(`/trips/${trip._id}/regenerate-day`, {
+        day,
+        preference,
+      });
+
+      const updatedTrip = response.data.trip;
+
+      setTrip(updatedTrip);
+
+      if (response.data.provider === "gemini") {
+        toast.success("✨ Day regenerated using Gemini");
+      } else {
+        toast.success("🤖 Day regenerated using Fallback");
+      }
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Failed to regenerate day");
+    }
+  };
+
   if (!trip) {
-    return <div className="p-8">Loading trip...</div>;
+    return <TripDetailsSkeleton />;
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-8 space-y-8">
-      <div>
-        <h1 className="text-4xl font-bold">{trip.destination}</h1>
+    <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+      {/* Header */}
 
-        <p className="text-gray-500 mt-2">
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <MapPin className="h-7 w-7 text-blue-600" />
+
+          <h1 className="text-5xl font-bold">{trip.destination}</h1>
+        </div>
+
+        <p className="text-slate-500">
           {trip.days} Days • {trip.budgetType} Budget
         </p>
+
+        {trip.aiProvider === "gemini" ? (
+          <div className="inline-flex items-center gap-2 rounded-full bg-green-100 text-green-700 px-4 py-2">
+            <Sparkles className="h-4 w-4" />
+            Gemini Generated
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 text-amber-700 px-4 py-2">
+            <Bot className="h-4 w-4" />
+            Fallback Generated
+          </div>
+        )}
       </div>
 
+      {/* Itinerary */}
+
       <section>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Itinerary</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold">🗓 Itinerary</h2>
 
           <button
             onClick={saveItinerary}
             disabled={saving}
-            className="bg-black text-white px-4 py-2 rounded"
+            className="
+              bg-blue-600
+              text-white
+              px-5
+              py-2
+              rounded-xl
+              hover:bg-blue-700
+              transition
+            "
           >
-            {saving ? "Saving..." : "Save Itinerary"}
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {trip.itinerary.map((day, dayIndex) => (
-            <div key={day.day} className="border rounded-lg p-4">
-              <h3 className="font-bold text-lg">Day {day.day}</h3>
+            <div
+              key={day.day}
+              className="
+                bg-white
+                border
+                rounded-3xl
+                p-6
+                shadow-sm
+              "
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold">Day {day.day}</h3>
 
-              <div className="mt-3 space-y-2">
+                <RegenerateDayDialog
+                  onRegenerate={(preference) =>
+                    regenerateDay(day.day, preference)
+                  }
+                />
+              </div>
+
+              <div className="space-y-3">
                 {day.activities.map((activity, activityIndex) => (
                   <div
                     key={activityIndex}
-                    className="flex items-center justify-between border rounded p-2"
+                    className="
+                        flex
+                        items-center
+                        justify-between
+                        border
+                        rounded-xl
+                        p-3
+                      "
                   >
                     <span>{activity}</span>
 
@@ -132,8 +227,6 @@ export default function TripDetailsPage({
 
                 <AddActivityDialog
                   onAdd={(activity) => {
-                    if (!trip) return;
-
                     const updatedTrip = structuredClone(trip);
 
                     updatedTrip.itinerary[dayIndex].activities.push(activity);
@@ -147,42 +240,96 @@ export default function TripDetailsPage({
         </div>
       </section>
 
+      {/* Budget */}
+
       <section>
-        <h2 className="text-2xl font-semibold mb-4">Budget Breakdown</h2>
+        <h2 className="text-3xl font-bold mb-6">💰 Budget Breakdown</h2>
 
-        <div className="border rounded-lg p-4">
-          <p>Flights: ${trip.budgetBreakdown.flights}</p>
+        <div className="grid md:grid-cols-5 gap-4">
+          <div className="bg-white border rounded-2xl p-4">
+            <p className="text-slate-500">Flights</p>
 
-          <p>Accommodation: ${trip.budgetBreakdown.accommodation}</p>
+            <h3 className="text-2xl font-bold">
+              ${trip.budgetBreakdown.flights}
+            </h3>
+          </div>
 
-          <p>Food: ${trip.budgetBreakdown.food}</p>
+          <div className="bg-white border rounded-2xl p-4">
+            <p className="text-slate-500">Accommodation</p>
 
-          <p>Activities: ${trip.budgetBreakdown.activities}</p>
+            <h3 className="text-2xl font-bold">
+              ${trip.budgetBreakdown.accommodation}
+            </h3>
+          </div>
 
-          <p className="font-bold mt-2">Total: ${trip.budgetBreakdown.total}</p>
+          <div className="bg-white border rounded-2xl p-4">
+            <p className="text-slate-500">Food</p>
+
+            <h3 className="text-2xl font-bold">${trip.budgetBreakdown.food}</h3>
+          </div>
+
+          <div className="bg-white border rounded-2xl p-4">
+            <p className="text-slate-500">Activities</p>
+
+            <h3 className="text-2xl font-bold">
+              ${trip.budgetBreakdown.activities}
+            </h3>
+          </div>
+
+          <div className="bg-blue-600 text-white rounded-2xl p-4">
+            <p>Total</p>
+
+            <h3 className="text-2xl font-bold">
+              ${trip.budgetBreakdown.total}
+            </h3>
+          </div>
         </div>
       </section>
 
+      {/* Hotels */}
+
       <section>
-        <h2 className="text-2xl font-semibold mb-4">Hotels</h2>
+        <h2 className="text-3xl font-bold mb-6">🏨 Hotels</h2>
 
-        {trip.hotels.map((hotel, index) => (
-          <div key={index} className="border rounded-lg p-4 mb-2">
-            <p className="font-semibold">{hotel.name}</p>
+        <div className="grid md:grid-cols-2 gap-4">
+          {trip.hotels.map((hotel, index) => (
+            <div
+              key={index}
+              className="
+                bg-white
+                border
+                rounded-2xl
+                p-5
+              "
+            >
+              <h3 className="font-semibold text-lg">{hotel.name}</h3>
 
-            <p>{hotel.type}</p>
-          </div>
-        ))}
+              <p className="text-slate-500 mt-2">{hotel.type}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Packing List</h2>
+      {/* Packing */}
 
-        <ul className="list-disc ml-5">
+      <section>
+        <h2 className="text-3xl font-bold mb-6">🎒 Packing List</h2>
+
+        <div className="grid md:grid-cols-2 gap-3">
           {trip.packingList.map((item, index) => (
-            <li key={index}>{item}</li>
+            <div
+              key={index}
+              className="
+                bg-white
+                border
+                rounded-xl
+                p-3
+              "
+            >
+              ✓ {item}
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
     </div>
   );

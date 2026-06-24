@@ -12,9 +12,9 @@ const createFallbackTrip = (
     itinerary: Array.from({ length: days }, (_, index) => ({
       day: index + 1,
       activities: [
-        `Explore popular attractions in ${destination}`,
-        `Enjoy local food and culture`,
-        `Experience activities related to ${interests[0] || "travel"}`,
+        `Visit top attractions in ${destination}`,
+        `Experience ${interests[0] || "local culture"} activities`,
+        `Enjoy authentic local cuisine`,
       ],
     })),
 
@@ -168,10 +168,15 @@ Return ONLY valid JSON.
       data: {
         day,
         activities: [
-          `Explore famous attractions in ${destination}`,
-          `Try local cuisine`,
-          `Enjoy ${preference || interests[0] || "travel experiences"}`,
-          `Discover local culture and landmarks`,
+          preference
+            ? `Focus on ${preference} experiences in ${destination}`
+            : `Visit must-see attractions in ${destination}`,
+
+          `Enjoy activities related to ${interests[0] || "local culture"}`,
+
+          `Try highly rated local restaurants and food spots`,
+
+          `Explore hidden gems and cultural landmarks in ${destination}`,
         ],
       },
     };
