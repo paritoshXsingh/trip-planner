@@ -35,6 +35,8 @@ export interface ITrip extends Document {
   hotels: any[];
 
   packingList: string[];
+
+  aiProvider: "gemini" | "fallback";
 }
 
 const tripSchema = new Schema<ITrip>(
@@ -92,6 +94,11 @@ const tripSchema = new Schema<ITrip>(
         type: String,
       },
     ],
+    aiProvider: {
+      type: String,
+      enum: ["gemini", "fallback"],
+      default: "fallback",
+    },
   },
   {
     timestamps: true,

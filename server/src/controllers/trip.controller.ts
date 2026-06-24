@@ -1,13 +1,16 @@
 import { Response } from "express";
 import { Trip } from "../models/trip.model";
 import { AuthRequest } from "../middleware/auth.middleware";
-import { generateTripPlan } from "../services/gemini.service";
+import {
+  generateTripPlan,
+  regenerateDayPlan,
+} from "../services/gemini.service";
 
 export const createTrip = async (req: AuthRequest, res: Response) => {
   try {
     const { destination, days, budgetType, interests } = req.body;
 
-    const aiPlan = await generateTripPlan(
+    const { plan, provider } = await generateTripPlan(
       destination,
       days,
       budgetType,
@@ -22,17 +25,20 @@ export const createTrip = async (req: AuthRequest, res: Response) => {
       budgetType,
       interests,
 
-      itinerary: aiPlan.itinerary,
+      itinerary: plan.itinerary,
 
-      budgetBreakdown: aiPlan.budgetBreakdown,
+      budgetBreakdown: plan.budgetBreakdown,
 
-      hotels: aiPlan.hotels,
+      hotels: plan.hotels,
 
-      packingList: aiPlan.packingList,
+      packingList: plan.packingList,
+
+      aiProvider: provider,
     });
 
     res.status(201).json({
       success: true,
+      provider,
       trip,
     });
   } catch (error) {
@@ -191,6 +197,64 @@ export const updateItinerary = async (req: AuthRequest, res: Response) => {
     res.status(500).json({
       success: false,
       message: "Failed to update itinerary",
+    });
+  }
+};
+
+export const regenerateDay = async (req: AuthRequest, res: Response) => {
+  try {
+    const { day, preference } = req.body;
+
+    const trip = await Trip.findOne({
+      _id: req.params.id,
+      userId: req.user?.id,
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: "Trip not found",
+      });
+    }
+
+    const { provider, data } = await regenerateDayPlan(
+      trip.destination,
+      day,
+      trip.budgetType,
+      trip.interests,
+      preference,
+    );
+
+    const updatedItinerary = [...trip.itinerary];
+
+    const dayIndex = updatedItinerary.findIndex(
+      (item: any) => item.day === day,
+    );
+
+    if (dayIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Day not found",
+      });
+    }
+
+    updatedItinerary[dayIndex] = data;
+
+    trip.itinerary = updatedItinerary as any;
+
+    await trip.save();
+
+    res.status(200).json({
+      success: true,
+      provider,
+      trip,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to regenerate day",
     });
   }
 };

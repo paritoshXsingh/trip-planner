@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api/axios";
+import { toast } from "sonner";
 
 import {
   Dialog,
@@ -56,11 +57,13 @@ export default function CreateTripDialog({ onSuccess }: Props) {
 
       setOpen(false);
 
+      toast.success("Trip generated successfully");
+
       onSuccess();
     } catch (error) {
       console.error(error);
 
-      alert("Failed to generate trip. Please try again.");
+      toast.error("Failed to generate trip. Please try again.");
     } finally {
       setLoading(false);
     }
