@@ -7,14 +7,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { logout } from "@/lib/auth";
+
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
 export default function LogoutDialog({ open, onClose }: Props) {
-  const logout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = () => {
+    logout();
+
     window.location.href = "/";
   };
 
@@ -25,16 +28,34 @@ export default function LogoutDialog({ open, onClose }: Props) {
           <DialogTitle>Logout</DialogTitle>
         </DialogHeader>
 
-        <p className="text-gray-500">Are you sure you want to logout?</p>
+        <p className="text-slate-500">Are you sure you want to logout?</p>
 
         <div className="flex justify-end gap-3 mt-4">
-          <button onClick={onClose} className="border px-4 py-2 rounded">
+          <button
+            onClick={onClose}
+            className="
+              border
+              px-4
+              py-2
+              rounded-lg
+              hover:bg-slate-50
+              transition
+            "
+          >
             Cancel
           </button>
 
           <button
-            onClick={logout}
-            className="bg-red-600 text-white px-4 py-2 rounded"
+            onClick={handleLogout}
+            className="
+              bg-red-600
+              text-white
+              px-4
+              py-2
+              rounded-lg
+              hover:bg-red-700
+              transition
+            "
           >
             Logout
           </button>

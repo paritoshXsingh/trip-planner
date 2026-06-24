@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { api } from "@/lib/api/axios";
 import { toast } from "sonner";
+import { login } from "@/lib/auth";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ export default function RegisterPage() {
 
       const response = await api.post("/auth/register", formData);
 
-      localStorage.setItem("token", response.data.token);
+      login(response.data.token);
 
       window.location.href = "/";
     } catch (error) {

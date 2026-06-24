@@ -2,16 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Hero() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    setIsLoggedIn(!!token);
-  }, []);
+  const isLoggedIn = useAuth();
 
   return (
     <section className="relative min-h-[90vh] overflow-hidden">

@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-
 import { api } from "@/lib/api/axios";
 import { toast } from "sonner";
+import { login } from "@/lib/auth";
 
 export default function LoginPage() {
-  const router = useRouter();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,7 +29,7 @@ export default function LoginPage() {
 
       const response = await api.post("/auth/login", formData);
 
-      localStorage.setItem("token", response.data.token);
+      login(response.data.token);
 
       window.location.href = "/";
     } catch (error) {

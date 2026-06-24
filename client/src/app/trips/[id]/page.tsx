@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 import { MapPin, Sparkles, Bot } from "lucide-react";
 import TripDetailsSkeleton from "@/components/trip/TripDetailsSkeleton";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 interface Trip {
   _id: string;
@@ -55,22 +56,22 @@ export default function TripDetailsPage({
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchTrip();
-  }, []);
+    const loadTrip = async () => {
+      try {
+        const { id } = await params;
 
-  const fetchTrip = async () => {
-    try {
-      const { id } = await params;
+        const response = await api.get(`/trips/${id}`);
 
-      const response = await api.get(`/trips/${id}`);
+        setTrip(response.data.trip);
+      } catch (error) {
+        console.error(error);
 
-      setTrip(response.data.trip);
-    } catch (error) {
-      console.error(error);
+        toast.error("Failed to load trip");
+      }
+    };
 
-      toast.error("Failed to load trip");
-    }
-  };
+    void loadTrip();
+  }, [params]);
 
   const removeActivity = (dayIndex: number, activityIndex: number) => {
     if (!trip) return;
@@ -132,43 +133,44 @@ export default function TripDetailsPage({
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
-      {/* Header */}
+    <ProtectedRoute>
+      <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+        {/* Header */}
 
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <MapPin className="h-7 w-7 text-blue-600" />
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <MapPin className="h-7 w-7 text-blue-600" />
 
-          <h1 className="text-5xl font-bold">{trip.destination}</h1>
+            <h1 className="text-5xl font-bold">{trip.destination}</h1>
+          </div>
+
+          <p className="text-slate-500">
+            {trip.days} Days • {trip.budgetType} Budget
+          </p>
+
+          {trip.aiProvider === "gemini" ? (
+            <div className="inline-flex items-center gap-2 rounded-full bg-green-100 text-green-700 px-4 py-2">
+              <Sparkles className="h-4 w-4" />
+              Gemini Generated
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 text-amber-700 px-4 py-2">
+              <Bot className="h-4 w-4" />
+              Fallback Generated
+            </div>
+          )}
         </div>
 
-        <p className="text-slate-500">
-          {trip.days} Days • {trip.budgetType} Budget
-        </p>
+        {/* Itinerary */}
 
-        {trip.aiProvider === "gemini" ? (
-          <div className="inline-flex items-center gap-2 rounded-full bg-green-100 text-green-700 px-4 py-2">
-            <Sparkles className="h-4 w-4" />
-            Gemini Generated
-          </div>
-        ) : (
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 text-amber-700 px-4 py-2">
-            <Bot className="h-4 w-4" />
-            Fallback Generated
-          </div>
-        )}
-      </div>
+        <section>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold">🗓 Itinerary</h2>
 
-      {/* Itinerary */}
-
-      <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">🗓 Itinerary</h2>
-
-          <button
-            onClick={saveItinerary}
-            disabled={saving}
-            className="
+            <button
+              onClick={saveItinerary}
+              disabled={saving}
+              className="
               bg-blue-600
               text-white
               px-5
@@ -177,38 +179,38 @@ export default function TripDetailsPage({
               hover:bg-blue-700
               transition
             "
-          >
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
+            >
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
 
-        <div className="space-y-6">
-          {trip.itinerary.map((day, dayIndex) => (
-            <div
-              key={day.day}
-              className="
+          <div className="space-y-6">
+            {trip.itinerary.map((day, dayIndex) => (
+              <div
+                key={day.day}
+                className="
                 bg-white
                 border
                 rounded-3xl
                 p-6
                 shadow-sm
               "
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold">Day {day.day}</h3>
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold">Day {day.day}</h3>
 
-                <RegenerateDayDialog
-                  onRegenerate={(preference) =>
-                    regenerateDay(day.day, preference)
-                  }
-                />
-              </div>
+                  <RegenerateDayDialog
+                    onRegenerate={(preference) =>
+                      regenerateDay(day.day, preference)
+                    }
+                  />
+                </div>
 
-              <div className="space-y-3">
-                {day.activities.map((activity, activityIndex) => (
-                  <div
-                    key={activityIndex}
-                    className="
+                <div className="space-y-3">
+                  {day.activities.map((activity, activityIndex) => (
+                    <div
+                      key={activityIndex}
+                      className="
                         flex
                         items-center
                         justify-between
@@ -216,121 +218,124 @@ export default function TripDetailsPage({
                         rounded-xl
                         p-3
                       "
-                  >
-                    <span>{activity}</span>
+                    >
+                      <span>{activity}</span>
 
-                    <DeleteActivityDialog
-                      onDelete={() => removeActivity(dayIndex, activityIndex)}
-                    />
-                  </div>
-                ))}
+                      <DeleteActivityDialog
+                        onDelete={() => removeActivity(dayIndex, activityIndex)}
+                      />
+                    </div>
+                  ))}
 
-                <AddActivityDialog
-                  onAdd={(activity) => {
-                    const updatedTrip = structuredClone(trip);
+                  <AddActivityDialog
+                    onAdd={(activity) => {
+                      const updatedTrip = structuredClone(trip);
 
-                    updatedTrip.itinerary[dayIndex].activities.push(activity);
+                      updatedTrip.itinerary[dayIndex].activities.push(activity);
 
-                    setTrip(updatedTrip);
-                  }}
-                />
+                      setTrip(updatedTrip);
+                    }}
+                  />
+                </div>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Budget */}
+
+        <section>
+          <h2 className="text-3xl font-bold mb-6">💰 Budget Breakdown</h2>
+
+          <div className="grid md:grid-cols-5 gap-4">
+            <div className="bg-white border rounded-2xl p-4">
+              <p className="text-slate-500">Flights</p>
+
+              <h3 className="text-2xl font-bold">
+                ${trip.budgetBreakdown.flights}
+              </h3>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Budget */}
+            <div className="bg-white border rounded-2xl p-4">
+              <p className="text-slate-500">Accommodation</p>
 
-      <section>
-        <h2 className="text-3xl font-bold mb-6">💰 Budget Breakdown</h2>
+              <h3 className="text-2xl font-bold">
+                ${trip.budgetBreakdown.accommodation}
+              </h3>
+            </div>
 
-        <div className="grid md:grid-cols-5 gap-4">
-          <div className="bg-white border rounded-2xl p-4">
-            <p className="text-slate-500">Flights</p>
+            <div className="bg-white border rounded-2xl p-4">
+              <p className="text-slate-500">Food</p>
 
-            <h3 className="text-2xl font-bold">
-              ${trip.budgetBreakdown.flights}
-            </h3>
+              <h3 className="text-2xl font-bold">
+                ${trip.budgetBreakdown.food}
+              </h3>
+            </div>
+
+            <div className="bg-white border rounded-2xl p-4">
+              <p className="text-slate-500">Activities</p>
+
+              <h3 className="text-2xl font-bold">
+                ${trip.budgetBreakdown.activities}
+              </h3>
+            </div>
+
+            <div className="bg-blue-600 text-white rounded-2xl p-4">
+              <p>Total</p>
+
+              <h3 className="text-2xl font-bold">
+                ${trip.budgetBreakdown.total}
+              </h3>
+            </div>
           </div>
+        </section>
 
-          <div className="bg-white border rounded-2xl p-4">
-            <p className="text-slate-500">Accommodation</p>
+        {/* Hotels */}
 
-            <h3 className="text-2xl font-bold">
-              ${trip.budgetBreakdown.accommodation}
-            </h3>
-          </div>
+        <section>
+          <h2 className="text-3xl font-bold mb-6">🏨 Hotels</h2>
 
-          <div className="bg-white border rounded-2xl p-4">
-            <p className="text-slate-500">Food</p>
-
-            <h3 className="text-2xl font-bold">${trip.budgetBreakdown.food}</h3>
-          </div>
-
-          <div className="bg-white border rounded-2xl p-4">
-            <p className="text-slate-500">Activities</p>
-
-            <h3 className="text-2xl font-bold">
-              ${trip.budgetBreakdown.activities}
-            </h3>
-          </div>
-
-          <div className="bg-blue-600 text-white rounded-2xl p-4">
-            <p>Total</p>
-
-            <h3 className="text-2xl font-bold">
-              ${trip.budgetBreakdown.total}
-            </h3>
-          </div>
-        </div>
-      </section>
-
-      {/* Hotels */}
-
-      <section>
-        <h2 className="text-3xl font-bold mb-6">🏨 Hotels</h2>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          {trip.hotels.map((hotel, index) => (
-            <div
-              key={index}
-              className="
+          <div className="grid md:grid-cols-2 gap-4">
+            {trip.hotels.map((hotel, index) => (
+              <div
+                key={index}
+                className="
                 bg-white
                 border
                 rounded-2xl
                 p-5
               "
-            >
-              <h3 className="font-semibold text-lg">{hotel.name}</h3>
+              >
+                <h3 className="font-semibold text-lg">{hotel.name}</h3>
 
-              <p className="text-slate-500 mt-2">{hotel.type}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+                <p className="text-slate-500 mt-2">{hotel.type}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      {/* Packing */}
+        {/* Packing */}
 
-      <section>
-        <h2 className="text-3xl font-bold mb-6">🎒 Packing List</h2>
+        <section>
+          <h2 className="text-3xl font-bold mb-6">🎒 Packing List</h2>
 
-        <div className="grid md:grid-cols-2 gap-3">
-          {trip.packingList.map((item, index) => (
-            <div
-              key={index}
-              className="
+          <div className="grid md:grid-cols-2 gap-3">
+            {trip.packingList.map((item, index) => (
+              <div
+                key={index}
+                className="
                 bg-white
                 border
                 rounded-xl
                 p-3
               "
-            >
-              ✓ {item}
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
+              >
+                ✓ {item}
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </ProtectedRoute>
   );
 }

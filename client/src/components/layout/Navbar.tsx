@@ -2,20 +2,15 @@
 
 import Link from "next/link";
 import { Plane, Menu, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
-
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import LogoutDialog from "./LogoutDialog";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    setIsLoggedIn(!!token);
-  }, []);
+  const isLoggedIn = useAuth();
 
   return (
     <>
@@ -100,14 +95,7 @@ export default function Navbar() {
       </header>
 
       {mobileMenuOpen && (
-        <div
-          className="
-      md:hidden
-      border-b
-      bg-white
-      shadow-sm
-    "
-        >
+        <div className="md:hidden border-b bg-white shadow-sm">
           <div className="flex flex-col p-4 gap-3">
             <Link
               href="/"
@@ -134,10 +122,10 @@ export default function Navbar() {
                   setShowLogout(true);
                 }}
                 className="
-            text-left
-            py-2
-            text-red-600
-          "
+                  text-left
+                  py-2
+                  text-red-600
+                "
               >
                 Logout
               </button>
@@ -155,10 +143,10 @@ export default function Navbar() {
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}
                   className="
-              py-2
-              text-blue-600
-              font-medium
-            "
+                    py-2
+                    text-blue-600
+                    font-medium
+                  "
                 >
                   Get Started
                 </Link>
