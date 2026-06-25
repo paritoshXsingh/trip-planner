@@ -5,6 +5,7 @@ services:
       - "5000:5000"
     env_file:
       - ./server/.env
+    restart: unless-stopped
 
   frontend:
     build: ./client
@@ -12,3 +13,4 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    restart: unless-stopped
