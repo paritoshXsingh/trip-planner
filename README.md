@@ -10,7 +10,7 @@ The project demonstrates full-stack development, AI integration, JWT authenticat
 
 # 🌐 Live Demo
 
-**Application:** http://65.2.39.37:3000
+**Application:** http://trippilot-paritosh.duckdns.org
 
 # 🚀 Features
 
