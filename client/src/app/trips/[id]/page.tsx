@@ -14,6 +14,7 @@ import { MapPin, Sparkles, Bot } from "lucide-react";
 import TripDetailsSkeleton from "@/components/trip/TripDetailsSkeleton";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import PackingChecklist from "@/components/trip/PackingChecklist";
+import ExportPdfButton from "@/components/trip/ExportPdfButton";
 
 interface Activity {
   time?: string;
@@ -176,21 +177,25 @@ export default function TripDetailsPage({
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-bold">🗓 Itinerary</h2>
 
-            <button
-              onClick={saveItinerary}
-              disabled={saving}
-              className="
-              bg-blue-600
-              text-white
-              px-5
-              py-2
-              rounded-xl
-              hover:bg-blue-700
-              transition
-            "
-            >
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
+            <div className="flex gap-3">
+              <ExportPdfButton trip={trip} />
+
+              <button
+                onClick={saveItinerary}
+                disabled={saving}
+                className="
+        bg-blue-600
+        text-white
+        px-5
+        py-2
+        rounded-xl
+        hover:bg-blue-700
+        transition
+      "
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -347,7 +352,11 @@ export default function TripDetailsPage({
         <section>
           <h2 className="text-3xl font-bold mb-6">🎒 Packing Checklist</h2>
 
-          <PackingChecklist tripId={trip._id} packingList={trip.packingList} />
+          <PackingChecklist
+            key={trip._id + JSON.stringify(trip.packingList)}
+            tripId={trip._id}
+            packingList={trip.packingList}
+          />
         </section>
       </div>
     </ProtectedRoute>

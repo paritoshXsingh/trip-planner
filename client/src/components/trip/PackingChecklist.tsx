@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api/axios";
@@ -22,16 +22,9 @@ interface Props {
 
 export default function PackingChecklist({ tripId, packingList }: Props) {
   const [items, setItems] = useState<PackingItem[]>(packingList);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    setItems(packingList);
-  }, [packingList]);
 
   const savePackingList = async (updatedItems: PackingItem[]) => {
     try {
-      setSaving(true);
-
       await api.put(`/trips/${tripId}/packing-list`, {
         packingList: updatedItems,
       });
@@ -42,7 +35,6 @@ export default function PackingChecklist({ tripId, packingList }: Props) {
 
       toast.error("Failed to update packing list");
     } finally {
-      setSaving(false);
     }
   };
 
