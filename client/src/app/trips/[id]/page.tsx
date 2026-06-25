@@ -13,7 +13,12 @@ import { toast } from "sonner";
 import { MapPin, Sparkles, Bot } from "lucide-react";
 import TripDetailsSkeleton from "@/components/trip/TripDetailsSkeleton";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import PackingChecklist from "@/components/trip/PackingChecklist";
 
+interface Activity {
+  time?: string;
+  description: string;
+}
 interface Trip {
   _id: string;
 
@@ -27,7 +32,7 @@ interface Trip {
 
   itinerary: {
     day: number;
-    activities: string[];
+    activities: (string | Activity)[];
   }[];
 
   budgetBreakdown: {
@@ -43,7 +48,11 @@ interface Trip {
     type: string;
   }[];
 
-  packingList: string[];
+  packingList: {
+    item: string;
+    packed: boolean;
+    addedByUser: boolean;
+  }[];
 }
 
 export default function TripDetailsPage({
@@ -219,7 +228,23 @@ export default function TripDetailsPage({
                         p-3
                       "
                     >
-                      <span>{activity}</span>
+                      <div className="flex flex-col flex-1">
+                        {typeof activity === "string" ? (
+                          <span>{activity}</span>
+                        ) : (
+                          <>
+                            {activity.time && (
+                              <span className="text-xs font-medium text-blue-600">
+                                {activity.time}
+                              </span>
+                            )}
+
+                            <span className="font-medium">
+                              {activity.description}
+                            </span>
+                          </>
+                        )}
+                      </div>
 
                       <DeleteActivityDialog
                         onDelete={() => removeActivity(dayIndex, activityIndex)}
@@ -231,7 +256,10 @@ export default function TripDetailsPage({
                     onAdd={(activity) => {
                       const updatedTrip = structuredClone(trip);
 
-                      updatedTrip.itinerary[dayIndex].activities.push(activity);
+                      updatedTrip.itinerary[dayIndex].activities.push({
+                        time: "",
+                        description: activity,
+                      });
 
                       setTrip(updatedTrip);
                     }}
@@ -317,23 +345,9 @@ export default function TripDetailsPage({
         {/* Packing */}
 
         <section>
-          <h2 className="text-3xl font-bold mb-6">🎒 Packing List</h2>
+          <h2 className="text-3xl font-bold mb-6">🎒 Packing Checklist</h2>
 
-          <div className="grid md:grid-cols-2 gap-3">
-            {trip.packingList.map((item, index) => (
-              <div
-                key={index}
-                className="
-                bg-white
-                border
-                rounded-xl
-                p-3
-              "
-              >
-                ✓ {item}
-              </div>
-            ))}
-          </div>
+          <PackingChecklist tripId={trip._id} packingList={trip.packingList} />
         </section>
       </div>
     </ProtectedRoute>

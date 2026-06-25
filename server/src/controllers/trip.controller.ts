@@ -258,3 +258,41 @@ export const regenerateDay = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+export const updatePackingList = async (req: AuthRequest, res: Response) => {
+  try {
+    const { packingList } = req.body;
+
+    const trip = await Trip.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        userId: req.user?.id,
+      },
+      {
+        packingList,
+      },
+      {
+        new: true,
+      },
+    );
+
+    if (!trip) {
+      return res.status(404).json({
+        success: false,
+        message: "Trip not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      trip,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update packing list",
+    });
+  }
+};

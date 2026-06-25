@@ -12,9 +12,18 @@ const createFallbackTrip = (
     itinerary: Array.from({ length: days }, (_, index) => ({
       day: index + 1,
       activities: [
-        `Visit top attractions in ${destination}`,
-        `Experience ${interests[0] || "local culture"} activities`,
-        `Enjoy authentic local cuisine`,
+        {
+          time: "09:00 AM",
+          description: `Visit top attractions in ${destination}`,
+        },
+        {
+          time: "01:00 PM",
+          description: `Experience ${interests[0] || "local culture"} activities`,
+        },
+        {
+          time: "06:00 PM",
+          description: "Enjoy authentic local cuisine",
+        },
       ],
     })),
 
@@ -34,12 +43,36 @@ const createFallbackTrip = (
     ],
 
     packingList: [
-      "Passport",
-      "Phone Charger",
-      "Power Bank",
-      "Comfortable Walking Shoes",
-      "Water Bottle",
-      "Travel Documents",
+      {
+        item: "Passport",
+        packed: false,
+        addedByUser: false,
+      },
+      {
+        item: "Phone Charger",
+        packed: false,
+        addedByUser: false,
+      },
+      {
+        item: "Power Bank",
+        packed: false,
+        addedByUser: false,
+      },
+      {
+        item: "Comfortable Walking Shoes",
+        packed: false,
+        addedByUser: false,
+      },
+      {
+        item: "Water Bottle",
+        packed: false,
+        addedByUser: false,
+      },
+      {
+        item: "Travel Documents",
+        packed: false,
+        addedByUser: false,
+      },
     ],
   };
 };
@@ -68,7 +101,12 @@ Return ONLY valid JSON using this schema:
   "itinerary":[
     {
       "day":1,
-      "activities":[]
+      "activities":[
+  {
+    "time":"09:00 AM",
+    "description":"Visit Eiffel Tower"
+  }
+]
     }
   ],
   "budgetBreakdown":{
@@ -84,7 +122,13 @@ Return ONLY valid JSON using this schema:
       "type":""
     }
   ],
-  "packingList":[]
+  "packingList":[
+  {
+    "item":"",
+    "packed":false,
+    "addedByUser":false
+  }
+]
 }
 `;
 
@@ -140,10 +184,19 @@ Return ONLY valid JSON.
 {
   "day": ${day},
   "activities": [
-    "Activity 1",
-    "Activity 2",
-    "Activity 3"
-  ]
+  {
+    "time":"09:00 AM",
+    "description":"Activity 1"
+  },
+  {
+    "time":"01:00 PM",
+    "description":"Activity 2"
+  },
+  {
+    "time":"06:00 PM",
+    "description":"Activity 3"
+  }
+]
 }
 `;
 
@@ -168,15 +221,24 @@ Return ONLY valid JSON.
       data: {
         day,
         activities: [
-          preference
-            ? `Focus on ${preference} experiences in ${destination}`
-            : `Visit must-see attractions in ${destination}`,
-
-          `Enjoy activities related to ${interests[0] || "local culture"}`,
-
-          `Try highly rated local restaurants and food spots`,
-
-          `Explore hidden gems and cultural landmarks in ${destination}`,
+          {
+            time: "09:00 AM",
+            description: preference
+              ? `Focus on ${preference} experiences in ${destination}`
+              : `Visit must-see attractions in ${destination}`,
+          },
+          {
+            time: "01:00 PM",
+            description: `Enjoy activities related to ${interests[0] || "local culture"}`,
+          },
+          {
+            time: "06:00 PM",
+            description: `Try highly rated local restaurants and food spots`,
+          },
+          {
+            time: "08:00 PM",
+            description: `Explore hidden gems and cultural landmarks in ${destination}`,
+          },
         ],
       },
     };

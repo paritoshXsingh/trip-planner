@@ -34,7 +34,11 @@ export interface ITrip extends Document {
 
   hotels: any[];
 
-  packingList: string[];
+  packingList: {
+    item: string;
+    packed: boolean;
+    addedByUser: boolean;
+  }[];
 
   aiProvider: "gemini" | "fallback";
 }
@@ -91,7 +95,18 @@ const tripSchema = new Schema<ITrip>(
 
     packingList: [
       {
-        type: String,
+        item: {
+          type: String,
+          required: true,
+        },
+        packed: {
+          type: Boolean,
+          default: false,
+        },
+        addedByUser: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
     aiProvider: {

@@ -7,6 +7,7 @@ import {
   updateTrip,
   updateItinerary,
   regenerateDay,
+  updatePackingList,
 } from "../controllers/trip.controller";
 import { protect } from "../middleware/auth.middleware";
 
@@ -23,6 +24,8 @@ router.put("/:id", protect, updateTrip);
 router.put("/:id/itinerary", protect, updateItinerary);
 
 router.post("/:id/regenerate-day", protect, regenerateDay);
+
+router.put("/:id/packing-list", protect, updatePackingList);
 
 router.delete("/:id", protect, deleteTrip);
 
