@@ -1,301 +1,153 @@
 # ✈️ TripPilot – AI Powered Travel Planner
 
-TripPilot is a full-stack AI-powered travel planning application that helps users generate personalized travel itineraries in seconds using Google's Gemini AI.
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Express](https://img.shields.io/badge/Express.js-Node-green)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-brightgreen)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)
+![AWS](https://img.shields.io/badge/AWS-EC2-orange)
 
-Users can create trips based on their destination, duration, budget, and interests, then manage every aspect of the itinerary—from activities and packing lists to exporting a beautifully formatted PDF.
+TripPilot is a production-ready AI-powered travel planner that generates personalized travel itineraries using Google's Gemini AI. It enables users to securely create and manage trips, receive AI-generated day-wise itineraries, estimate budgets, get hotel recommendations, customize itineraries, regenerate individual travel days, and export trips as PDF documents.
 
-The project demonstrates full-stack development, AI integration, JWT authentication, Docker containerization, and AWS deployment.
+## 🌐 Live Demo
+
+**https://trippilot-paritosh.duckdns.org**
+
+## 💻 GitHub
+
+**https://github.com/paritoshXsingh/trip-planner**
 
 ---
 
-# 🌐 Live Demo
+# 📖 Project Overview
 
-**Application:** https://trippilot-paritosh.duckdns.org
+TripPilot simplifies travel planning by combining AI with modern full-stack development. After authentication, users enter a destination, duration, budget and interests. The backend constructs a structured prompt for Gemini AI, receives a complete itinerary, validates it, stores it in MongoDB Atlas and presents it through a responsive Next.js interface.
 
-# 🚀 Features
+The application supports complete itinerary management instead of treating AI output as static. Users can add their own activities, delete unwanted activities, regenerate only a selected day, and export the final itinerary as a PDF.
 
-## Authentication
+---
 
-- User Registration
-- User Login
+# ✨ Features
+
+## Authentication & Authorization
+- User Registration & Login
 - JWT Authentication
 - Protected Routes
-- Persistent Login
+- User-specific Dashboard
+- User data isolation
 
----
-
-## AI Trip Generation
-
-Generate personalized trips using **Google Gemini AI**.
-
-The AI generates:
-
-- Multi-day itinerary
+## AI Travel Planning
+- Generate personalized itineraries
 - Budget estimation
-- Recommended hotels
-- Packing checklist
-
-If Gemini is unavailable, the application automatically falls back to an internal itinerary generator to ensure uninterrupted user experience.
-
----
-
-## Dashboard
-
-Users can:
-
-- View all created trips
-- Open trip details
-- Delete trips
-- Create unlimited trips
-
----
-
-## Trip Details
-
-Each trip includes:
-
-- Destination
-- Duration
-- Budget
-- AI Provider
-- Daily itinerary
-- Hotels
-- Budget breakdown
-- Packing checklist
-
----
-
-## Editable Itinerary
-
-Users can:
-
-- Add activities
-- Delete activities
-- Save itinerary changes
-- Regenerate an individual day using AI
-
----
-
-## Packing Checklist
-
-Interactive packing management:
-
-- Mark items as packed
-- Progress bar
-- Add custom items
-- Delete custom items
-- Automatic database persistence
-
----
-
-## Budget Breakdown
-
-Estimated costs for:
-
-- Flights
-- Accommodation
-- Food
-- Activities
-- Total Budget
-
----
-
-## Hotel Recommendations
-
-AI-generated hotel suggestions based on trip preferences.
-
----
-
-## PDF Export
-
-Generate a professional travel itinerary PDF including:
-
-- Destination
-- Duration
-- Budget
-- AI Provider
-- Complete itinerary
-- Budget table
 - Hotel recommendations
-- Packing checklist
-- Packing progress
-- Generation timestamp
-- Professional formatting
-- Automatic page breaks
-- Footer and page numbers
+- Day-wise activity planning
+
+## Trip Management
+- Create Trips
+- View Trips
+- View Trip Details
+- Delete Trips
+
+## Itinerary Management
+- ➕ Add Custom Activities
+- ❌ Delete Activities
+- 🔄 Regenerate Individual Days using AI
+
+## Custom Feature
+- 📄 Export complete itinerary as PDF
 
 ---
 
 # 🛠 Tech Stack
 
-## Frontend
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 16, React, TypeScript, Tailwind CSS |
+| Backend | Node.js, Express.js, TypeScript |
+| Database | MongoDB Atlas |
+| AI | Google Gemini API |
+| Authentication | JWT |
+| Deployment | Docker, Docker Compose, AWS EC2, Nginx |
+| Security | Let's Encrypt SSL, HTTPS |
+| Domain | DuckDNS |
 
-- Next.js 16 (App Router)
-- React 19
-- TypeScript
-- Tailwind CSS v4
-- Axios
-- Sonner
-- Lucide Icons
-- jsPDF
-- jsPDF AutoTable
+## Why this stack?
 
----
-
-## Backend
-
-- Node.js
-- Express.js
-- TypeScript
-- MongoDB Atlas
-- Mongoose
-- JWT Authentication
-- Google Gemini API
-
----
-
-## DevOps
-
-- Docker
-- Docker Compose
-- AWS EC2
-- Ubuntu Server
+- **Next.js** for performant React applications.
+- **TypeScript** for type safety and maintainability.
+- **Express.js** for modular REST APIs.
+- **MongoDB Atlas** for flexible document storage.
+- **Docker** for reproducible deployments.
+- **Nginx** as a reverse proxy serving frontend and backend under one HTTPS domain.
+- **Gemini AI** for intelligent itinerary generation.
 
 ---
 
 # 📂 Project Structure
 
-```
+```text
 trip-planner/
-
 ├── client/
-│   ├── src/
-│   ├── public/
-│   ├── Dockerfile
-│   └── package.json
-│
 ├── server/
-│   ├── src/
-│   ├── Dockerfile
-│   └── package.json
-│
 ├── docker-compose.yml
 └── README.md
 ```
 
 ---
 
-# ⚙️ Environment Variables
+# ⚙️ Setup Instructions
 
-## Backend (.env)
+## Local Development
 
-```
-PORT=5000
-
-MONGO_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_jwt_secret
-
-GEMINI_API_KEY=your_gemini_api_key
-```
-
----
-
-## Frontend (.env.local)
-
-```
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-```
-
----
-
-# 💻 Running Locally
-
-## 1. Clone Repository
+### Clone
 
 ```bash
 git clone https://github.com/paritoshXsingh/trip-planner.git
-
 cd trip-planner
 ```
-
----
-
-## 2. Install Dependencies
 
 ### Backend
 
 ```bash
 cd server
-
 npm install
+```
+
+Create `.env`
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_secret
+GEMINI_API_KEY=your_key
+```
+
+Run
+
+```bash
+npm run dev
 ```
 
 ### Frontend
 
 ```bash
-cd ../client
-
+cd client
 npm install
 ```
 
----
+Create `.env.local`
 
-## 3. Configure Environment Variables
-
-Create:
-
-```
-server/.env
-```
-
-```
-PORT=5000
-
-MONGO_URI=your_mongodb_connection_string
-
-JWT_SECRET=your_secret
-
-GEMINI_API_KEY=your_api_key
-```
-
-Create:
-
-```
-client/.env.local
-```
-
-```
+```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
 
----
-
-## 4. Run Backend
+Run
 
 ```bash
-cd server
-
 npm run dev
 ```
 
-Runs on:
-
-```
-http://localhost:5000
-```
-
----
-
-## 5. Run Frontend
-
-```bash
-cd client
-
-npm run dev
-```
-
-Runs on:
+Open:
 
 ```
 http://localhost:3000
@@ -303,174 +155,157 @@ http://localhost:3000
 
 ---
 
-# 🐳 Running with Docker
+# 🐳 Docker Setup
 
-## Clone
+Create the required environment files:
+
+- `server/.env`
+- `client/.env.local`
+
+Run:
 
 ```bash
-git clone https://github.com/paritoshXsingh/trip-planner.git
-
-cd trip-planner
+docker-compose up --build -d
 ```
 
 ---
 
-## Configure Environment Variables
+# ☁️ Production Deployment
 
-Backend:
-
-```
-server/.env
-```
-
-Frontend:
-
-```
-client/.env.local
-```
-
----
-
-## Build Containers
-
-```bash
-docker compose build
-```
-
----
-
-## Start Containers
-
-```bash
-docker compose up -d
-```
-
-Application:
-
-Frontend
-
-```
-http://localhost:3000
-```
-
-Backend
-
-```
-http://localhost:5000
-```
-
----
-
-## Stop Containers
-
-```bash
-docker compose down
-```
-
----
-
-# ☁️ AWS Deployment
-
-The application is containerized using Docker and deployed on an Ubuntu EC2 instance.
-
-Deployment workflow:
-
-```bash
-git pull
-
-docker-compose up -d --build
-```
+The application is deployed on AWS EC2.
 
 Infrastructure:
 
-- AWS EC2
 - Docker
 - Docker Compose
+- Nginx Reverse Proxy
+- DuckDNS Domain
+- Let's Encrypt SSL
 - MongoDB Atlas
-- Google Gemini API
+
+Live URL:
+
+**https://trippilot-paritosh.duckdns.org**
 
 ---
 
-# 📄 REST API
+# 🏗 High-Level Architecture
 
-## Authentication
-
-```
-POST /api/auth/register
-
-POST /api/auth/login
-```
-
----
-
-## Trips
-
-```
-POST /api/trips
-
-GET /api/trips
-
-GET /api/trips/:id
-
-PUT /api/trips/:id
-
-DELETE /api/trips/:id
+```text
+          Browser
+              │
+              ▼
+      Nginx Reverse Proxy
+      ├───────────────┐
+      ▼               ▼
+ Next.js Frontend   Express API
+                        │
+                        ▼
+                 MongoDB Atlas
+                        │
+                        ▼
+                 Google Gemini AI
 ```
 
 ---
 
-## Itinerary
+# 🔐 Authentication & Authorization
 
-```
-PUT /api/trips/:id/itinerary
-
-POST /api/trips/:id/regenerate-day
-```
-
----
-
-## Packing
-
-```
-PUT /api/trips/:id/packing-list
-```
+1. User registers.
+2. Password is hashed before storage.
+3. User logs in.
+4. JWT token is generated.
+5. Token is attached to protected requests.
+6. Middleware validates the token.
+7. APIs only return resources owned by the authenticated user.
 
 ---
 
-# 📈 Future Improvements
+# 🤖 AI Agent Design & Purpose
 
-- Interactive maps
-- Flight API integration
-- Hotel booking integration
-- Expense tracking
-- Weather forecasts
+The backend constructs prompts from:
+
+- Destination
+- Number of days
+- Budget
+- Interests
+
+Gemini AI generates:
+
+- Day-wise itinerary
+- Budget estimate
+- Hotel recommendations
+
+The generated itinerary is editable. Users can add custom activities, remove AI-generated ones, or regenerate only a selected day to reduce unnecessary AI calls.
+
+---
+
+# ⭐ Creative Feature
+
+## Editable AI Itinerary
+
+Instead of locking users into AI output, TripPilot lets users:
+
+- Add custom activities
+- Delete activities
+- Regenerate specific days
+
+This creates a hybrid workflow combining AI assistance with complete user control.
+
+## PDF Export
+
+Users can download a professionally formatted itinerary for offline access and sharing.
+
+---
+
+# 🎯 Key Design Decisions & Trade-offs
+
+- TypeScript for maintainability and type safety.
+- MongoDB for flexible nested itinerary documents.
+- JWT for stateless authentication.
+- Docker for consistent environments.
+- Nginx reverse proxy to eliminate CORS and mixed-content issues.
+- Regenerate one day instead of the entire itinerary to reduce AI cost and improve responsiveness.
+
+---
+
+# ⚠️ Known Limitations
+
+- AI output may vary.
+- Budget estimates are approximate.
+- Hotel recommendations are AI-generated, not live booking data.
+- No email verification or password reset.
+- No collaborative trip editing.
+- Limited caching and rate limiting.
+
+---
+
+# 🚀 Future Improvements
+
+- Live hotel APIs
+- Weather integration
+- Maps integration
 - Collaborative trip planning
-- Offline support
-- Email itinerary sharing
-- Custom themes
-- Calendar integration
+- Email verification
+- OAuth login
+- AI chat assistant
 
 ---
 
-# 🎯 Learning Outcomes
+# 📚 Learning Outcomes
 
-This project demonstrates experience with:
+This project strengthened my understanding of:
 
-- Full Stack MERN Development
-- Next.js App Router
+- Full-stack architecture
 - TypeScript
-- JWT Authentication
-- REST API Design
-- MongoDB Atlas
-- Google Gemini AI Integration
-- Docker Containerization
-- Docker Compose
-- AWS EC2 Deployment
-- Responsive UI Design
-- PDF Generation
-- State Management
-- Production Deployment
-- Git & GitHub Workflow
+- JWT authentication
+- REST API design
+- AI integration
+- Docker & Docker Compose
+- AWS EC2 deployment
+- Nginx reverse proxy
+- HTTPS with Let's Encrypt
+- Production debugging
 
 ---
 
@@ -478,10 +313,5 @@ This project demonstrates experience with:
 
 **Paritosh Singh**
 
-GitHub: https://github.com/paritoshXsingh
-
-LinkedIn: https://www.linkedin.com/in/paritosh-singh-dev
-
----
-
-If you found this project interesting, feel free to ⭐ the repository.
+- GitHub: https://github.com/paritoshXsingh
+- Live Demo: https://trippilot-paritosh.duckdns.org
